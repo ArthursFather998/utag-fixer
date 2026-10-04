@@ -123,7 +123,9 @@ export function createFixer(opts) {
     } catch (e) { (opts.onLog || console.warn)('album-first pass failed', e); }
 
     // Phase 2: parallel fix pool for everything the album pass left over.
-    const skipHandle = {};
+    // A caller-supplied skipHandle (or a fresh one) receives .now(trackId)
+    // so the UI can interrupt a track mid-run.
+    const skipHandle = (runOpts.skipHandle && typeof runOpts.skipHandle === 'object') ? runOpts.skipHandle : {};
     await engine.fixTrackPool(leftover, roster, {
       concurrency: runOpts.concurrency || 5,
       skipHandle,

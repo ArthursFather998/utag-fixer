@@ -14,13 +14,6 @@ let reviewItems = [];
 let running = false;
 let skipHandle = null;
 
-function keys() {
-  return {
-    acoustIdKey: () => ($('acoustid').value || '').trim(),
-    fanartKey: () => ($('fanart').value || '').trim(),
-  };
-}
-
 function initFixer() {
   fixer = createFixer({
     storage: createIndexedDB('utag-fixer-demo'),
@@ -139,7 +132,7 @@ async function toggleSkip(id) {
   if (!t) return;
   const skipped = await fixer.isSkipped(t);
   if (skipped) {
-    await fixer.unskipTrack(t);
+    await fixer.unskip(t);
     t._skipped = false;
     setStatus(t, '', '');
   } else {
@@ -243,6 +236,7 @@ $('fixall').addEventListener('click', async () => {
   running = true;
   $('fixall').disabled = true;
   $('healbtn').disabled = true;
+  skipHandle = {}; // live during the run: the Skip button interrupts mid-flight
   const roster = [...new Set(tracks.map(t => t.artist).filter(a => a && a !== 'Unknown Artist'))];
   const albums = [...new Map(tracks.filter(t => t.album && t.album !== 'Unknown Album')
     .map(t => [t.album + '|||' + t.artist, { name: t.album, artist: t.artist }])).values()];
@@ -252,9 +246,9 @@ $('fixall').addEventListener('click', async () => {
       roster,
       albums,
       artists: roster,
+      skipHandle,
       onTrack: (t, status, note) => setStatus(t, status, note),
     });
-    skipHandle = res.skipHandle;
     reviewItems = res.review;
     renderReview();
     setStats(res);
