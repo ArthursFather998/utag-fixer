@@ -38,6 +38,8 @@ export function createCatalogGate() {
 
 // MusicBrainz paced search. One instance per fixer (its cache and pacing
 // state are per run, never global).
+export const DEFAULT_USER_AGENT = 'utag-fixer/1.0 (https://github.com/ArthursFather998/utag-fixer)';
+
 export function createMbSearch(userAgent) {
   const mbCache = new Map();
   let mbLastReq = 0;
@@ -75,7 +77,7 @@ export function createMbSearch(userAgent) {
         const t = setTimeout(() => c.abort(), 15000);
         const r = await fetch('https://musicbrainz.org/ws/2/recording/?query=' + encodeURIComponent(q) + '&fmt=json&limit=8', {
           signal: c.signal,
-          headers: { 'User-Agent': userAgent || 'utag-fixer/1.0 (audio tag fixer)' },
+          headers: { 'User-Agent': userAgent || DEFAULT_USER_AGENT },
         });
         clearTimeout(t);
         if (r.status === 503) { await new Promise(rr => setTimeout(rr, backoff)); backoff *= 2; continue; }

@@ -3,7 +3,7 @@
    -> learn. Audio never leaves the device (AcoustID sends only the
    on-device fingerprint + duration). */
 
-import { createCatalogGate, createMbSearch } from './gates.js';
+import { createCatalogGate, createMbSearch, DEFAULT_USER_AGENT } from './gates.js';
 import { createCatalog } from './catalog.js';
 import { createCurated } from './curated.js';
 import { createInMemory } from './memory.js';
@@ -12,6 +12,7 @@ import { parseAudioFile } from './reader.js';
 import { fileNameCandidates, fmtDur } from './utils.js';
 
 export { createInMemory, createIndexedDB } from './memory.js';
+export { DEFAULT_USER_AGENT } from './gates.js';
 export { createCurated } from './curated.js';
 export { fileNameCandidates, fmtDur, strSim, titleSimilar } from './utils.js';
 
@@ -35,7 +36,7 @@ export { fileNameCandidates, fmtDur, strSim, titleSimilar } from './utils.js';
 export function createFixer(opts) {
   opts = opts || {};
   const gate = createCatalogGate();
-  const mb = createMbSearch(opts.userAgent || 'utag-fixer/1.0 (audio tag fixer)');
+  const mb = createMbSearch(opts.userAgent || DEFAULT_USER_AGENT);
   const catalog = createCatalog({
     gate,
     mb,
