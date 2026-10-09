@@ -1,5 +1,17 @@
 # utag-fixer
 
+## 2026-10 update: this is now the UTAG backend
+
+UTAG is a persistent song-metadata knowledge system: a verified database is the product, and Hermes (an AI researcher) grows it by checking songs against the open internet. This repo now carries the backend:
+
+- `supabase/migrations/` — the database schema (artists, edition-aware releases, tracks, artwork, source results, verifications, corrections, chat) plus the submissions inbox Splotify sends unknowns and corrections to.
+- `supabase/functions/utag-control/` — the gated write path for the UTAG website (corrections, confidence changes, verification resolution, Hermes chat send). Password-gated; deploy in the Supabase dashboard with a `SITE_PASSWORD` secret.
+- `import_knowledge.py` — one-time, idempotent import of the knowledge the old fixer world had accumulated (discography, curated rulings, supplied artwork) into the database.
+
+The website lives in the `utag` repo (arthursfather998.github.io/utag). Splotify no longer contains a fixer engine: it looks songs up in this database, caches verified records on-device, and submits what it cannot find.
+
+## Legacy engine (below)
+
 A standalone audio tag-fixing engine. It repairs broken or missing metadata on audio files by checking them against public music catalogs, with a learned memory of past fixes and a review queue for uncertain corrections.
 
 Extracted from a personal music-player project into a clean, UI-free ES module. No build step, plain ES modules.
