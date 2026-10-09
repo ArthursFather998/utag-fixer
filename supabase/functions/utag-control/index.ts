@@ -40,11 +40,22 @@ const EDITABLE: Record<string, string[]> = {
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...CORS },
   });
 }
 
+// Browser calls are cross-origin (GitHub Pages -> Supabase): the function
+// must answer CORS preflights itself and carry the headers on every
+// response, or the browser blocks the call before it lands.
+const CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Max-Age": "86400",
+};
+
 Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
   if (req.method !== "POST") return json({ ok: false, error: "POST only" }, 405);
 
   let body: Record<string, unknown>;
